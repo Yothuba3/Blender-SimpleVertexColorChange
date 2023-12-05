@@ -24,23 +24,24 @@ class SimpleVertexColorOperator(bpy.types.Operator):
         my_tool = scn.my_vertex_color_tool
         color = (my_tool.color[0], my_tool.color[1], my_tool.color[2], 1.0)  # RGBA
 
-        obj = context.active_object
-        if obj.type == 'MESH' and obj.mode == 'EDIT':
-            bpy.ops.object.mode_set(mode='OBJECT')  # エディットモードからオブジェクトモードに変更
+        objs = context.selected_objects
+        for obj in objs:
+            if obj.type == 'MESH' and obj.mode == 'EDIT':
+                bpy.ops.object.mode_set(mode='OBJECT')  # エディットモードからオブジェクトモードに変更
 
-            mesh = obj.data
-            if not mesh.vertex_colors:
-                mesh.vertex_colors.new()
+                mesh = obj.data
+                if not mesh.vertex_colors:
+                    mesh.vertex_colors.new()
 
-            color_layer = mesh.vertex_colors.active
+                color_layer = mesh.vertex_colors.active
 
-            for poly in mesh.polygons:
-                for idx in poly.loop_indices:
-                    loop_vert_idx = mesh.loops[idx].vertex_index
-                    if mesh.vertices[loop_vert_idx].select:
-                        color_layer.data[idx].color = color
+                for poly in mesh.polygons:
+                    for idx in poly.loop_indices:
+                        loop_vert_idx = mesh.loops[idx].vertex_index
+                        if mesh.vertices[loop_vert_idx].select:
+                            color_layer.data[idx].color = color
 
-            bpy.ops.object.mode_set(mode='EDIT')  # 元のエディットモードに戻す
+                bpy.ops.object.mode_set(mode='EDIT')  # 元のエディットモードに戻す
 
         return {'FINISHED'}
 
